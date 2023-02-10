@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bananice.org.mapper.EmployeeMapper">
+    <!--保存对象-->
+    <insert id="save" parameterType="Employee" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into employee(
+                            username,
+                            age,
+                            phone,
+                            email,
+                            salt,
+                            password,
+                            state,
+                            logininfo_id
+        ) values(
+                #{username},
+                #{age},
+                #{phone},
+                #{email},
+                #{salt},
+                #{password},
+                #{state},
+                #{logininfoId}        )
+    </insert>
+    <!--删除对象-->
+    <delete id="delete" parameterType="long">
+        delete from employee where id = #{id}
+    </delete>
+
+    <!--更新对象-->
+    <update id="update" parameterType="Employee">
+        update employee
+        set
+
+                            username = #{username},
+                            age = #{age},
+                            phone = #{phone},
+                            email = #{email},
+                            salt = #{salt},
+                            password = #{password},
+                            state = #{state},
+                            logininfo_id = #{logininfoId}        where id = #{id}
+    </update>
+    <!--加载对象-->
+    <select id="loadById" resultMap="BaseResultMap" parameterType="long">
+        select * from employee where id = #{id}
+    </select>
+    <!--加载所有对象-->
+    <select id="loadAll" resultMap="BaseResultMap">
+        select * from employee
+    </select>
+    <!--//查询总数=参数（查询对象），返回值：Integer-->
+    <select id="queryCount" parameterType="EmployeeQuery" resultType="Integer">
+        select count(*) from employee
+        <include refid="whereSql"/>
+    </select>
+    <!--//查询当前页数据=参数（查询对象），返回值:List-->
+    <select id="queryData" parameterType="EmployeeQuery" resultType="Employee">
+        select * from employee
+        <include refid="whereSql"/>
+        limit #{begin},#{pageSize}
+    </select>
+
+
+    <sql id="whereSql">
+        <where>
+            <if test="keyword!=null and keyword!=''">
+                and (name like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </sql>
+
+    <!--//批量删除-->
+    <delete id="bulkRemove" parameterType="arraylist">
+        delete from employee where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bananice.org.domain.Employee">
+    <result column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="age" property="age" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="salt" property="salt" />
+        <result column="password" property="password" />
+        <result column="state" property="state" />
+        <result column="logininfo_id" property="logininfoId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+id,
+        username, age, phone, email, salt, password, state, logininfo_id
+    </sql>
+
+</mapper>

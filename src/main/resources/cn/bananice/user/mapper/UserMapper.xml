@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bananice.user.mapper.UserMapper">
+    <!--保存对象-->
+    <insert id="save" parameterType="User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into user(username,
+                         gender,
+                         age,
+                         birthday,
+                         phone,
+                         email,
+                         identity,
+                         disability_code,
+                         disability_type_id,
+                         disability_level,
+                         address_id,
+                         salt,
+                         password,
+                         state,
+                         logininfo_id)
+        values (#{username},
+                #{gender},
+                #{age},
+                #{birthday},
+                #{phone},
+                #{email},
+                #{identity},
+                #{disabilityCode},
+                #{disabilityTypeId},
+                #{disabilityLevel},
+                #{addressId},
+                #{salt},
+                #{password},
+                #{state},
+                #{logininfoId})
+    </insert>
+    <!--删除对象-->
+    <delete id="delete" parameterType="long">
+        delete
+        from user
+        where id = #{id}
+    </delete>
+
+    <!--更新对象-->
+    <update id="update" parameterType="User">
+        update user
+        set username           = #{username},
+            gender             = #{gender},
+            age                = #{age},
+            birthday           = #{birthday},
+            phone              = #{phone},
+            email              = #{email},
+            identity           = #{identity},
+            disability_code    = #{disabilityCode},
+            disability_type_id = #{disabilityTypeId},
+            disability_level   = #{disabilityLevel},
+            address_id         = #{addressId},
+            salt               = #{salt},
+            password           = #{password},
+            state              = #{state},
+            logininfo_id       = #{logininfoId}
+        where id = #{id}
+    </update>
+    <!--加载对象-->
+    <select id="loadById" resultMap="BaseResultMap" parameterType="long">
+        select *
+        from user
+        where id = #{id}
+    </select>
+    <!--加载所有对象-->
+    <select id="loadAll" resultMap="BaseResultMap">
+        select *
+        from user
+    </select>
+    <!--//查询总数=参数（查询对象），返回值：Integer-->
+    <select id="queryCount" parameterType="UserQuery" resultType="Integer">
+        select count(*) from user
+        <include refid="whereSql"/>
+    </select>
+    <!--//查询当前页数据=参数（查询对象），返回值:List-->
+    <select id="queryData" parameterType="UserQuery" resultType="User">
+        select * from user
+        <include refid="whereSql"/>
+        limit #{begin},#{pageSize}
+    </select>
+
+
+    <sql id="whereSql">
+        <where>
+            <if test="keyword!=null and keyword!=''">
+                and (name like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </sql>
+
+    <!--//批量删除-->
+    <delete id="bulkRemove" parameterType="arraylist">
+        delete from user where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bananice.user.domain.User">
+        <result column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="gender" property="gender"/>
+        <result column="age" property="age"/>
+        <result column="birthday" property="birthday"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="identity" property="identity"/>
+        <result column="disability_code" property="disabilityCode"/>
+        <result column="disability_type_id" property="disabilityTypeId"/>
+        <result column="disability_level" property="disabilityLevel"/>
+        <result column="address_id" property="addressId"/>
+        <result column="salt" property="salt"/>
+        <result column="password" property="password"/>
+        <result column="state" property="state"/>
+        <result column="logininfo_id" property="logininfoId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        username, gender, age, birthday, phone, email, identity, disability_code, disability_type_id, disability_level, address_id, salt, password, state, logininfo_id
+    </sql>
+
+    <!-- User queryByPhone(String phone);-->
+    <select id="queryByPhone" resultMap="BaseResultMap">
+        select * from user where phone=#{phone};
+    </select>
+
+    <!--User loadByEmail(String email);-->
+    <select id="loadByEmail" resultMap="BaseResultMap">
+        select * from user where email=#{email}
+    </select>
+
+    <!--User loadByLogininfoId(Long logininfoId);-->
+    <select id="loadByLogininfoId" resultMap="BaseResultMap">
+        select * from user where logininfo_id=#{logininfoId};
+    </select>
+</mapper>

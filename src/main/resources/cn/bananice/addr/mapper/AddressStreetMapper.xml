@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bananice.addr.mapper.AddressStreetMapper">
+    <!--保存对象-->
+    <insert id="save" parameterType="AddressStreet" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into address_street(
+                            name
+        ) values(
+                #{name}        )
+    </insert>
+    <!--删除对象-->
+    <delete id="delete" parameterType="long">
+        delete from address_street where id = #{id}
+    </delete>
+
+    <!--更新对象-->
+    <update id="update" parameterType="AddressStreet">
+        update address_street
+        set
+
+                            name = #{name}        where id = #{id}
+    </update>
+    <!--加载对象-->
+    <select id="loadById" resultMap="BaseResultMap" parameterType="long">
+        select * from address_street where id = #{id}
+    </select>
+    <!--加载所有对象-->
+    <select id="loadAll" resultMap="BaseResultMap">
+        select * from address_street
+    </select>
+    <!--//查询总数=参数（查询对象），返回值：Integer-->
+    <select id="queryCount" parameterType="AddressStreetQuery" resultType="Integer">
+        select count(*) from address_street
+        <include refid="whereSql"/>
+    </select>
+    <!--//查询当前页数据=参数（查询对象），返回值:List-->
+    <select id="queryData" parameterType="AddressStreetQuery" resultType="AddressStreet">
+        select * from address_street
+        <include refid="whereSql"/>
+        limit #{begin},#{pageSize}
+    </select>
+
+
+    <sql id="whereSql">
+        <where>
+            <if test="keyword!=null and keyword!=''">
+                and (name like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </sql>
+
+    <!--//批量删除-->
+    <delete id="bulkRemove" parameterType="arraylist">
+        delete from address_street where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bananice.addr.domain.AddressStreet">
+    <result column="id" property="id" />
+        <result column="name" property="name" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+id,
+        name
+    </sql>
+
+</mapper>

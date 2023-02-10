@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bananice.user.mapper.DisabilityTypeMapper">
+    <!--保存对象-->
+    <insert id="save" parameterType="DisabilityType" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into disability_type(
+                            name
+        ) values(
+                #{name}        )
+    </insert>
+    <!--删除对象-->
+    <delete id="delete" parameterType="long">
+        delete from disability_type where id = #{id}
+    </delete>
+
+    <!--更新对象-->
+    <update id="update" parameterType="DisabilityType">
+        update disability_type
+        set
+
+                            name = #{name}        where id = #{id}
+    </update>
+    <!--加载对象-->
+    <select id="loadById" resultMap="BaseResultMap" parameterType="long">
+        select * from disability_type where id = #{id}
+    </select>
+    <!--加载所有对象-->
+    <select id="loadAll" resultMap="BaseResultMap">
+        select * from disability_type
+    </select>
+    <!--//查询总数=参数（查询对象），返回值：Integer-->
+    <select id="queryCount" parameterType="DisabilityTypeQuery" resultType="Integer">
+        select count(*) from disability_type
+        <include refid="whereSql"/>
+    </select>
+    <!--//查询当前页数据=参数（查询对象），返回值:List-->
+    <select id="queryData" parameterType="DisabilityTypeQuery" resultType="DisabilityType">
+        select * from disability_type
+        <include refid="whereSql"/>
+        limit #{begin},#{pageSize}
+    </select>
+
+
+    <sql id="whereSql">
+        <where>
+            <if test="keyword!=null and keyword!=''">
+                and (name like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </sql>
+
+    <!--//批量删除-->
+    <delete id="bulkRemove" parameterType="arraylist">
+        delete from disability_type where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bananice.user.domain.DisabilityType">
+    <result column="id" property="id" />
+        <result column="name" property="name" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+id,
+        name
+    </sql>
+
+</mapper>

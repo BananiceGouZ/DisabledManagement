@@ -1,0 +1,54 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+spring:
+  freemarker:
+    allow-request-override: false
+    cache: true
+    check-template-location: true
+    charset: UTF-8
+    suffix: .ftl
+    templateEncoding: UTF-8
+    templateLoaderPath: classpath:/templates/
+    expose-request-attributes: true
+    expose-session-attributes: true
+    expose-spring-macro-helpers: true
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    jedis:
+      pool:
+        max-wait: 2000ms
+        min-idle: 2
+        max-idle: 8
+  mail:
+    host: smtp.qq.com   # 设置邮箱主机(服务商),这里使用QQ邮件服务器
+    username: 1640986862@qq.com  # 设置用户名
+    password: sxjqmbadzfzwgchi # 设置密码，该处的密码是QQ邮箱开启SMTP的授权码而非QQ密码
+    properties:
+      mail:
+        smtp:
+          auth: true  # 必须进行授权认证，它的目的就是阻止他人任意乱发邮件
+          starttls: #SMTP加密方式:连接到一个TLS保护连接
+            enable: true
+            required: true
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql:///disabled_management
+    driver-class-name: com.mysql.jdbc.Driver
+mybatis:
+  type-aliases-package: cn.bananice.*.domain,cn.bananice.*.query
+logging:
+  level:
+    cn:
+      bananice: trace
+jwt:
+  rsa:
+    pri:  hrm_auth_rsa
+    pub:  hrm_auth_rsa.pub
+
+pagedir: D:\ideawork\disabled-management-web-parent\disabled-management-web\detail

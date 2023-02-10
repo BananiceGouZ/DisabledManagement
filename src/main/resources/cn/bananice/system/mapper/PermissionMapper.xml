@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bananice.system.mapper.PermissionMapper">
+    <!--保存对象-->
+    <insert id="save" parameterType="Permission" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into permission(
+                            name,
+                            url,
+                            descs,
+                            sn
+        ) values(
+                #{name},
+                #{url},
+                #{descs},
+                #{sn}        )
+    </insert>
+    <!--删除对象-->
+    <delete id="delete" parameterType="long">
+        delete from permission where id = #{id}
+    </delete>
+
+    <!--更新对象-->
+    <update id="update" parameterType="Permission">
+        update permission
+        set
+
+                            name = #{name},
+                            url = #{url},
+                            descs = #{descs},
+                            sn = #{sn}        where id = #{id}
+    </update>
+    <!--加载对象-->
+    <select id="loadById" resultType="Permission" parameterType="long">
+        select * from permission where id = #{id}
+    </select>
+    <!--加载所有对象-->
+    <select id="loadAll" resultMap="BaseResultMap">
+        select * from permission
+    </select>
+    <!--//查询总数=参数（查询对象），返回值：Integer-->
+    <select id="queryCount" parameterType="PermissionQuery" resultType="Integer">
+        select count(*) from permission
+        <include refid="whereSql"/>
+    </select>
+    <!--//查询当前页数据=参数（查询对象），返回值:List-->
+    <select id="queryData" parameterType="PermissionQuery" resultType="Permission">
+        select * from permission
+        <include refid="whereSql"/>
+        limit #{begin},#{pageSize}
+    </select>
+
+
+    <sql id="whereSql">
+        <where>
+            <if test="keyword!=null and keyword!=''">
+                and (name like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </sql>
+
+    <!--//批量删除-->
+    <delete id="bulkRemove" parameterType="arraylist">
+        delete from permission where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bananice.system.domain.Permission">
+    <result column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="url" property="url" />
+        <result column="descs" property="descs" />
+        <result column="sn" property="sn" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+id,
+        name, url, descs, sn
+    </sql>
+
+    <!-- Permission loadBySn(String sn);-->
+    <select id="loadBySn" resultType="Permission">
+        select * from permission where sn=#{sn}
+    </select>
+
+    <!-- List<String> loadByLogininfoId(Long logininfoId);-->
+    <select id="loadByLogininfoId" resultType="String">
+        select p.sn from (select id from employee where logininfo_id=#{logininfoId}) e
+            join employee_role er on e.id=er.employee_id
+            join role_permission rp on er.role_id=rp.role_id
+            join permission p on rp.permission_id=p.id
+    </select>
+</mapper>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bananice.system.mapper.RoleMapper">
+    <!--保存对象-->
+    <insert id="save" parameterType="Role" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into role(name,
+                           sn)
+        values (#{name},
+                #{sn})
+    </insert>
+    <!--删除对象-->
+    <delete id="delete" parameterType="long">
+        delete
+        from role
+        where id = #{id}
+    </delete>
+
+    <!--更新对象-->
+    <update id="update" parameterType="Role">
+        update role
+        set name = #{name},
+            sn   = #{sn}
+        where id = #{id}
+    </update>
+    <!--加载对象-->
+    <select id="loadById" resultType="Role" parameterType="long">
+        select *
+        from role
+        where id = #{id}
+    </select>
+    <!--加载所有对象-->
+    <select id="loadAll" resultMap="BaseResultMap">
+        select *
+        from role
+    </select>
+    <!--//查询总数=参数（查询对象），返回值：Integer-->
+    <select id="queryCount" parameterType="RoleQuery" resultType="Integer">
+        select count(*) from role
+        <include refid="whereSql"/>
+    </select>
+    <!--//查询当前页数据=参数（查询对象），返回值:List-->
+    <select id="queryData" parameterType="RoleQuery" resultType="Role">
+        select * from role
+        <include refid="whereSql"/>
+        limit #{begin},#{pageSize}
+    </select>
+
+
+    <sql id="whereSql">
+        <where>
+            <if test="keyword!=null and keyword!=''">
+                and (name like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </sql>
+
+    <!--//批量删除-->
+    <delete id="bulkRemove" parameterType="arraylist">
+        delete from role where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bananice.system.domain.Role">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="sn" property="sn"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        name, sn
+    </sql>
+
+    <!-- void deleteRoleMenuByRoleId(Long roleId);-->
+    <delete id="deleteRoleMenuByRoleId">
+        delete from role_menu where role_id=#{roleId}
+    </delete>
+
+    <!-- void deleteRolePermissionByRoleId(Long roleId);-->
+    <delete id="deleteRolePermissionByRoleId">
+        delete from role_permission where role_id=#{roleId}
+    </delete>
+
+    <!-- void saveRoleMenuByRoleId(@Param("roleId") Long roleId, @Param("menus") List<Long> menus);-->
+    <insert id="saveRoleMenuByRoleId">
+        insert into role_menu(role_id, menu_id) VALUES
+        <foreach collection="menus" item="menuId" separator=",">
+            (#{roleId},#{menuId})
+        </foreach>
+    </insert>
+
+    <!-- void saveRolePermissionByRoleId(@Param("roleId") Long roleId, @Param("permissions") List<Long> permissions);-->
+    <insert id="saveRolePermissionByRoleId">
+        insert into role_permission VALUES
+        <foreach collection="permissions" item="permissionId" separator=",">
+            (#{roleId},#{permissionId})
+        </foreach>
+    </insert>
+</mapper>

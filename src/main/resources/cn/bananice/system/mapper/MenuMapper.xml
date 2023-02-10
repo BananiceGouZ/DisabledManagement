@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bananice.system.mapper.MenuMapper">
+    <!--保存对象-->
+    <insert id="save" parameterType="Menu" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into menu(name,
+                           component,
+                           url,
+                           icon,
+                           `index`,
+                           parent_id,
+                           intro,
+                           state)
+        values (#{name},
+                #{component},
+                #{url},
+                #{icon},
+                #{index},
+                #{parent.id},
+                #{intro},
+                #{state})
+    </insert>
+    <!--删除对象-->
+    <delete id="delete" parameterType="long">
+        delete
+        from menu
+        where id = #{id}
+    </delete>
+
+    <!--更新对象-->
+    <update id="update" parameterType="Menu">
+        update menu
+        set name      = #{name},
+            component = #{component},
+            url       = #{url},
+            icon      = #{icon},
+            `index`     = #{index},
+            parent_id = #{parent.id},
+            intro     = #{intro},
+            state     = #{state}
+        where id = #{id}
+    </update>
+    <!--加载对象-->
+    <select id="loadById" resultType="Menu" parameterType="long">
+        select *
+        from menu
+        where id = #{id}
+    </select>
+    <!--加载所有对象-->
+    <select id="loadAll" resultMap="BaseResultMap">
+        select *
+        from menu
+    </select>
+    <!--//查询总数=参数（查询对象），返回值：Integer-->
+    <select id="queryCount" parameterType="MenuQuery" resultType="Integer">
+        select count(*) from menu m
+        <include refid="whereSql"/>
+    </select>
+    <!--//查询当前页数据=参数（查询对象），返回值:List-->
+    <select id="queryData" parameterType="MenuQuery" resultMap="MenuMap">
+        select m.*,p.id pid,p.name pname from menu m left join menu p on m.parent_id=p.id
+        <include refid="whereSql"/>
+        limit #{begin},#{pageSize}
+    </select>
+
+    <resultMap id="MenuMap" type="Menu">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="component" property="component"/>
+        <result column="url" property="url"/>
+        <result column="icon" property="icon"/>
+        <result column="index" property="index"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="intro" property="intro"/>
+        <result column="state" property="state"/>
+        <collection property="parent" ofType="Menu">
+            <id column="pid" property="id"/>
+            <result column="pname" property="name"/>
+        </collection>
+    </resultMap>
+
+    <sql id="whereSql">
+        <where>
+            <if test="keyword!=null and keyword!=''">
+                and (m.name like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </sql>
+
+    <!--//批量删除-->
+    <delete id="bulkRemove" parameterType="arraylist">
+        delete from menu where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bananice.system.domain.Menu">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="component" property="component"/>
+        <result column="url" property="url"/>
+        <result column="icon" property="icon"/>
+        <result column="index" property="index"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="intro" property="intro"/>
+        <result column="state" property="state"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        name, component, url, icon, index, parent_id, intro, state
+    </sql>
+
+    <resultMap id="MenuTreeMap" type="Menu">
+        <id column="pid" property="id"/>
+        <result column="pname" property="name"/>
+        <result column="pcomponent" property="component"/>
+        <result column="purl" property="url"/>
+        <result column="icon" property="icon"/>
+        <result column="index" property="index"/>
+        <collection property="children" ofType="Menu">
+            <result column="id" property="id"/>
+            <result column="name" property="name"/>
+            <result column="component" property="component"/>
+            <result column="url" property="url"/>
+            <result column="icon" property="icon"/>
+            <result column="index" property="index"/>
+        </collection>
+    </resultMap>
+    <!--List<Menu> loadByLogininfoId(Long logininfoId);-->
+    <select id="loadByLogininfoId" resultMap="MenuTreeMap">
+        SELECT m.*, pm.id pid, pm.name pname, pm.component pcomponent, pm.url purl, pm.icon picon, pm.index pindex
+        FROM (SELECT id FROM employee WHERE logininfo_id = #{logininfoId}) e
+                 JOIN employee_role er ON e.id = er.employee_id
+                 JOIN role_menu rm ON er.role_id = rm.role_id
+                 JOIN menu m ON rm.menu_id = m.id
+                 JOIN menu pm ON m.parent_id = pm.id
+        order by pm.`index`,m.`index`
+    </select>
+
+    <!--List<Menu> loadParent();-->
+    <select id="loadParent" resultType="Menu">
+        select *
+        from menu
+        where parent_id is null;
+    </select>
+
+</mapper>
